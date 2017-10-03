@@ -8,6 +8,9 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
+import android.view.View;
+import android.widget.Button;
+import android.widget.Toast;
 
 import java.util.List;
 import java.util.UUID;
@@ -18,6 +21,9 @@ public class CrimePagerActivity extends AppCompatActivity {
 
     private ViewPager mViewPager;
     private List<Crime> mCrimes;
+    private Button mFirstButton;
+    private Button mLastButton;
+    private int currentView;
 
     public static Intent newIntent(Context packageContext, UUID crimeId) {
         Intent intent = new Intent(packageContext, CrimePagerActivity.class);
@@ -41,7 +47,6 @@ public class CrimePagerActivity extends AppCompatActivity {
                 Crime crime = mCrimes.get(position);
                 return CrimeFragment.newInstance(crime.getId());
             }
-
             @Override
             public int getCount() {
                 return mCrimes.size();
@@ -51,10 +56,29 @@ public class CrimePagerActivity extends AppCompatActivity {
         for (int i = 0; i < mCrimes.size(); i++) {
             if (mCrimes.get(i).getId().equals(crimeId)) {
                 mViewPager.setCurrentItem(i);
+                currentView = i;
                 break;
             }
         }
 
-    }
+        mFirstButton = (Button) findViewById(R.id.first_button);
+        mFirstButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                //mFirstButton.setClickable(false);
+                mViewPager.setCurrentItem(0);
+                //Toast.makeText(getApplicationContext(), "clickable", Toast.LENGTH_SHORT).show();
+            }
+        });
 
+        mLastButton = (Button) findViewById(R.id.last_button);
+        mLastButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                //mLastButton.setClickable(false);
+                mViewPager.setCurrentItem(99);
+                //Toast.makeText(getApplicationContext(), "clickable", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
 }
