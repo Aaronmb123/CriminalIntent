@@ -41,4 +41,14 @@ public class CrimeLab {
         return null;
     }
 
+    public void removeById(UUID crimeId) {
+        for (int i = 0; i < mCrimes.size(); i++) {
+            if (mCrimes.get(i).getId() == crimeId) {
+                mCrimes.remove(i);
+                return;
+            }
+        }
+
+    }
+
 }
