@@ -13,6 +13,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -22,6 +23,8 @@ import java.util.List;
 public class CrimeListFragment extends Fragment {
 
     private RecyclerView mCrimeRecyclerView;
+    private Button mCreateCrimeButton;
+    private TextView mNoCrimesTextView;
     private CrimeAdapter mAdapter;
     private boolean mSubtitleVisible;
     private static final String SAVED_SUBTITLE_VISIBILE = "subtitle";
@@ -32,17 +35,43 @@ public class CrimeListFragment extends Fragment {
         setHasOptionsMenu(true);
     }
 
+    private void determineViewVisibilities() {
+        int numberCrimes = CrimeLab.get(getActivity()).getCrimes().size();
+        if (numberCrimes == 0) {
+            mCreateCrimeButton.setVisibility(View.VISIBLE);
+            mNoCrimesTextView.setVisibility(View.VISIBLE);
+            mCrimeRecyclerView.setVisibility(View.GONE);
+            mCreateCrimeButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Crime crime = new Crime();
+                    CrimeLab.get(getActivity()).addCrime(crime);
+                    Intent intent = CrimePagerActivity.newIntent(getActivity(), crime.getId());
+                    startActivity(intent);
+                }
+            });
+        } else {
+            mCreateCrimeButton.setVisibility(View.GONE);
+            mNoCrimesTextView.setVisibility(View.GONE);
+            mCrimeRecyclerView.setVisibility(View.VISIBLE);
+            mCrimeRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+            updateUI();
+        }
+    }
+
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_crime_list, container, false);
+        mCreateCrimeButton = (Button) view.findViewById(R.id.no_crimes_button);
+        mNoCrimesTextView = (TextView) view.findViewById(R.id.no_crimes_text_view);
         mCrimeRecyclerView = (RecyclerView) view.findViewById(R.id.crime_recycler_view);
-        mCrimeRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+
+        determineViewVisibilities();
 
         if (savedInstanceState != null) {
             mSubtitleVisible = savedInstanceState.getBoolean(SAVED_SUBTITLE_VISIBILE);
         }
-
-        updateUI();
 
         return view;
     }
@@ -56,7 +85,7 @@ public class CrimeListFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        updateUI();
+        determineViewVisibilities();
     }
 
     @Override
